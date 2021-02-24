@@ -1,0 +1,30 @@
+DECLARE @ID NUMERIC(13)
+  DECLARE @ID_MOVIMENTO_TEMPORAL	T_NUMERO_GRANDE
+
+  
+
+  DECLARE CEXPANSAO CURSOR FOR  
+    SELECT id FROM Ly_Cobranca_Alt_Venc ca WHERE not exists (select 1 from ly_cobranca where cobranca=ca.cobranca) 
+	and exists (select 1 from ly_movimento_temporal where entidade = 'Ly_Cobranca_Alt_Venc' and id1=ca.id) 
+     
+  
+  -- Executando 
+  OPEN CEXPANSAO  
+    
+  FETCH NEXT FROM CEXPANSAO INTO @ID
+
+  WHILE (@@FETCH_STATUS = 0)  
+	BEGIN  
+		SELECT @ID_MOVIMENTO_TEMPORAL = ID_MOVIMENTO_TEMPORAL
+		FROM LY_MOVIMENTO_TEMPORAL
+		WHERE ENTIDADE = 'Ly_Cobranca_Alt_Venc'
+		AND ID1 = @ID
+		
+		DELETE LY_MOVIMENTO_TEMPORAL WHERE ID_MOVIMENTO_TEMPORAL = @ID_MOVIMENTO_TEMPORAL
+		
+		FETCH NEXT FROM CEXPANSAO INTO @ID
+
+	END
+ 
+ CLOSE CEXPANSAO  
+ DEALLOCATE CEXPANSAO  

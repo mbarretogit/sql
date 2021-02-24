@@ -1,0 +1,81 @@
+USE LYCEUM
+GO
+
+--EXEC FTC_Relat_CadernetaMigracao 2015,1,'03','GRADUACAO',NULL,NULL
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND OBJECT_ID = OBJECT_ID('dbo.FTC_Relat_CadernetaMigracao'))
+   exec('CREATE PROCEDURE [dbo].[FTC_Relat_CadernetaMigracao] AS BEGIN SET NOCOUNT OFF; END')
+GO 
+
+ 
+ALTER PROCEDURE dbo.FTC_Relat_CadernetaMigracao       
+(            
+  
+  @p_ano VARCHAR(4)      
+, @p_semestre VARCHAR(2)      
+, @p_unidade VARCHAR(20)      
+, @p_tipo VARCHAR(20)        
+, @p_curso  VARCHAR(20)        
+, @p_disciplina VARCHAR(20)
+)            
+AS            
+-- [INÍCIO]                    
+BEGIN            
+        
+SET NOCOUNT ON   
+
+SELECT DISTINCT
+		UE.UNIDADE_ENS	AS COD_UNIDADE
+		,UE.NOME_COMP	AS NOME_UNIDADE
+		,A.CURSO		AS COD_CURSO
+		,C.NOME			AS NOME_CURSO
+		,HM.ANO
+		,HM.SEMESTRE
+		,D.DISCIPLINA	AS COD_DISCIPLINA
+		,D.NOME			AS NOME_DISCIPLINA
+		,D.CREDITOS		AS CARGA_HORARIA
+		,A.ALUNO		AS ALUNO
+		,A.NOME_COMPL	AS NOME_ALUNO
+		,NOTA_FINAL		AS MEDIA_FINAL
+		,SITUACAO_HIST	AS SITUACAO
+FROM LY_HISTMATRICULA HM
+JOIN LY_ALUNO A ON A.ALUNO = HM.ALUNO
+JOIN LY_CURSO C ON C.CURSO = A.CURSO
+JOIN LY_DISCIPLINA D ON D.DISCIPLINA = HM.DISCIPLINA
+JOIN LY_UNIDADE_ENSINO UE ON UE.UNIDADE_ENS = C.FACULDADE
+WHERE 1=1
+AND ((@p_ano IS NOT NULL AND HM.ANO = @p_ano) OR @p_ano IS NULL)        
+AND ((@p_semestre IS NOT NULL AND HM.SEMESTRE = @p_semestre)  OR @p_semestre IS NULL)        
+AND ((@p_unidade IS NOT NULL AND C.FACULDADE = @p_unidade) OR @p_unidade IS NULL)       
+AND ((@p_tipo IS NOT NULL AND C.TIPO = @p_tipo) OR @p_tipo IS NULL)        
+AND ((@p_curso IS NOT NULL AND C.CURSO = @p_curso) OR @p_curso IS NULL)      
+AND ((@p_disciplina IS NOT NULL AND HM.DISCIPLINA = @p_disciplina) OR @p_disciplina IS NULL)   
+
+ORDER BY HM.ANO, HM.SEMESTRE,D.DISCIPLINA,A.NOME_COMPL
+
+SET NOCOUNT OFF        
+        
+END   
+
+-- [FIM]          
+    
+    
+DELETE FROM LY_CUSTOM_CLIENTE    
+where NOME = 'FTC_Relat_CadernetaMigracao'    
+and IDENTIFICACAO_CODIGO = '0001' 
+GO
+
+INSERT INTO LY_CUSTOM_CLIENTE
+(NOME, IDENTIFICACAO_CODIGO, AUTOR, DATA_CRIACAO, OBJETIVO, SOLICITADO_POR, ATIVO, TIPOCOMPONENTE, TIPO, CLIENTE)
+SELECT
+  'FTC_Relat_CadernetaMigracao' NOME
+, '0001' IDENTIFICAO_CODIGO
+, 'Miguel' AUTOR
+, '2017-08-14' DATA_CRIACAO
+, 'Relatório - Caderneta de Notas - Migração' OBJETIVO
+, 'Liziene, André Britto' SOLICITADO_POR
+, 'S' ATIVO
+, 'PROCEDURE' TIPOCOMPONENTE
+, 'CLIENTE' TIPO
+, 'FTC' CLIENTE
+GO 

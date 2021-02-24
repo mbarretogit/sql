@@ -1,0 +1,82 @@
+-- EP PROGRAMADO
+-- OBJETIVO:
+-- REMOVER O CONTRATO DO ALUNO EM CASO DE REMOÇÃO DE DISCIPLINA
+-- ESTORNAR AS COBRANÇAS FUTURAS EM CASO DE REMOÇÃO DE DISCIPLINA
+ALTER PROCEDURE a_APoD_Ly_matricula        
+  @erro VARCHAR(1024) OUTPUT,        
+  @aluno VARCHAR(20), @disciplina VARCHAR(20), @turma VARCHAR(20), @ano NUMERIC(4),         
+  @semestre NUMERIC(2), @sit_matricula VARCHAR(20), @conceito_fim VARCHAR(15), @conceito_fim_num NUMERIC(10, 2),         
+  @tot_aulas NUMERIC(6), @obs VARCHAR(2000), @perc_presfim NUMERIC(5, 4), @lanc_deb NUMERIC(10),         
+  @dt_ultalt DATETIME, @subturma1 VARCHAR(20), @subturma2 VARCHAR(20), @cobranca_sep VARCHAR(1),         
+  @sit_detalhe VARCHAR(50), @serie_calculo NUMERIC(3), @dt_insercao DATETIME, @dt_matricula DATETIME,         
+  @num_chamada NUMERIC(10), @grupo_eletiva VARCHAR(20), @dt_reabertura DATETIME, @cumpriu_grupo VARCHAR(1)        
+AS  
+BEGIN      
+-- [INÍCIO] Customização - Não escreva código antes desta linha       
+    DECLARE @V_COBRANCA T_NUMERO
+	DECLARE @V_LOOP INT 
+	DECLARE @v_id_contrato INT
+	SET @v_id_contrato = 0
+
+	SELECT @v_id_contrato = ID_CONTRATO_ALUNO
+	FROM LY_CONTRATO_ALUNO
+	WHERE ALUNO = @aluno
+	AND ANO = @ano
+	AND PERIODO = @semestre
+	AND CONTRATO_ACEITO = 'S'
+
+	IF @v_id_contrato > 0
+	BEGIN
+		-- EXECUTA REMOÇÃO DO CONTRATO E GUARDA A IMAGEM
+		EXEC PR_AUTOMATIZA_REMOCAO_CONTRATO @aluno, @v_id_contrato
+	END
+
+	IF EXISTS
+	(
+		SELECT TOP 1 1
+		FROM LY_ITEM_LANC IL
+		JOIN LY_COBRANCA COB
+			ON (IL.COBRANCA = COB.COBRANCA)
+		WHERE IL.LANC_DEB = @lanc_deb
+		AND COB.ESTORNO = 'N'
+		AND COB.DATA_DE_VENCIMENTO > GETDATE()
+	)
+	BEGIN  
+
+		-- CALCULO E RECÁLCULO DA DÍVIDA  
+		DELETE ZZCRO_ERROS WHERE SPID = @@SPID  
+
+		CREATE TABLE #TBL_LOOP (ID INT, COBRANCA INT, ANO INT, MES INT)  
+  
+		INSERT INTO #TBL_LOOP  
+		SELECT DISTINCT ROW_NUMBER()OVER(ORDER BY C.COBRANCA) ID, C.COBRANCA, C.ANO, C.MES  
+		FROM LY_COBRANCA C   
+		WHERE C.ALUNO = @aluno  
+		AND C.DATA_DE_VENCIMENTO >= GETDATE()  
+		AND NOT(C.ANO = DATEPART(YYYY,GETDATE()) AND C.MES = DATEPART(MM,GETDATE()))  
+		AND (C.ESTORNO IS NULL OR C.ESTORNO = 'N')  
+		AND C.NUM_COBRANCA = 1  
+		AND NOT EXISTS ( SELECT TOP 1 1 FROM LY_ITEM_CRED IC WHERE IC.COBRANCA = C.COBRANCA )                                   -- NÃO EXISTA PAGAMENTOS  
+		AND NOT EXISTS ( SELECT TOP 1 1 FROM LY_ITEM_LANC IL WHERE IL.COBRANCA = C.COBRANCA AND IL.COBRANCA_ORIG IS NOT NULL)   -- COBRANÇA NÃO PODE TER RESTITUIÇÃO  
+		AND NOT EXISTS ( SELECT TOP 1 1 FROM LY_ITEM_LANC IL WHERE IL.COBRANCA = C.COBRANCA AND IL.ACORDO IS NOT NULL)          -- COBRANÇA NÃO PODE TER SIDO ACORDADA  
+		AND EXISTS ( SELECT TOP 1 1 FROM LY_ITEM_LANC IL WHERE IL.COBRANCA = C.COBRANCA AND IL.LANC_DEB = @lanc_deb )  
+		AND NOT EXISTS ( SELECT TOP 1 1 FROM LY_ITEM_LANC IL WHERE IL.COBRANCA = C.COBRANCA AND IL.DT_ENVIO_CONTAB IS NOT NULL) 
+  
+		-- ----------------------------------------------------------------------------------------------------  
+		-- ESTORNA AS COBRANCAS ENCONTRADAS  
+		-- ----------------------------------------------------------------------------------------------------  
+		DELETE ZZCRO_ERROS WHERE SPID = @@SPID  
+		SELECT @V_LOOP = MIN(ID) FROM #TBL_LOOP  
+		WHILE @V_LOOP IS NOT NULL  
+		BEGIN  
+			SELECT @V_COBRANCA = COBRANCA FROM #TBL_LOOP WHERE ID = @V_LOOP  
+			EXEC ESTORNA_COBRANCA @V_COBRANCA  
+			SELECT @V_LOOP = MIN(ID) FROM #TBL_LOOP WHERE ID > @V_LOOP  
+		END 
+	END  
+
+	SET @erro=''
+	RETURN
+-- [FIM] Customização - Não escreva código após esta linha
+END
+GO

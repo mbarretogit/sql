@@ -1,0 +1,64 @@
+-- Lyceum vProducao  
+-- Gerado por:  --   fabiola em 25/02/2015 ”s 10:44h  
+--   CronosRN, Version=1.1.3631.35283, Culture=neutral, PublicKeyToken=4a25cea0e390af6e  
+-- +ltimo load por jairo em 23/02/2015 ”s 15:34:19 do banco SQLServer (sa@techne87:LycCronosProducao) 
+-- CREATE PROCEDURE zLy_lanc_debito_Upd    @erro VARCHAR(1024) OUTPUT,    @pkLanc_deb NUMERIC(10),   
+-- @lanc_deb NUMERIC(20, 10) = -99992.93 OUTPUT, @codigo_lanc VARCHAR(200) = '__UNDEF_VARCHAR__' OUTPUT,    
+-- @aluno VARCHAR(200) = '__UNDEF_VARCHAR__' OUTPUT, @ano_ref NUMERIC(20, 10) = -99992.93 OUTPUT,    
+-- @periodo_ref NUMERIC(20, 10) = -99992.93 OUTPUT, @data DATETIME = '01/01/1753' OUTPUT,     @valor NUMERIC(20, 10) = -99992.93 OUTPUT,
+-- @lote NUMERIC(20, 10) = -99992.93 OUTPUT,     @descricao VARCHAR(200) = '__UNDEF_VARCHAR__' OUTPUT, 
+--@solicitacao NUMERIC(20, 10) = -99992.93 OUTPUT,     @item_solicitacao NUMERIC(20, 10) = -99992.93 OUTPUT, 
+--@trancado_calculo VARCHAR(200) = '__UNDEF_CHAR__' OUTPUT,     @grupo VARCHAR(200) = '__UNDEF_VARCHAR__' OUTPUT,
+-- @matricula VARCHAR(200) = '__UNDEF_CHAR__' OUTPUT,     @fl_field_01 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT,
+-- @fl_field_02 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT,     @fl_field_03 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT, 
+--@fl_field_04 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT,     @fl_field_05 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT,
+-- @fl_field_06 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT,     @fl_field_07 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT,
+-- @fl_field_08 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT,     @fl_field_09 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT, 
+--@fl_field_10 VARCHAR(2100) = '__UNDEF_VARCHAR__' OUTPUT,     @divida_orig NUMERIC(20, 10) = -99992.93 OUTPUT  AS    SET NOCOUNT ON      
+--SET @erro = NULL      DECLARE @oldLanc_deb NUMERIC(10)    DECLARE @oldCodigo_lanc VARCHAR(20)    DECLARE @oldAluno VARCHAR(20)    
+--DECLARE @oldAno_ref NUMERIC(4)    DECLARE @oldPeriodo_ref NUMERIC(2)    DECLARE @oldData DATETIME    DECLARE @oldValor NUMERIC(10, 2)   
+-- DECLARE @oldLote NUMERIC(10)    DECLARE @oldDescricao VARCHAR(100)    DECLARE @oldSolicitacao NUMERIC(10)    
+--DECLARE @oldItem_solicitacao NUMERIC(10)    DECLARE @oldTrancado_calculo VARCHAR(1)    DECLARE @oldGrupo VARCHAR(20)   
+-- DECLARE @oldMatricula VARCHAR(1)    DECLARE @oldFl_field_01 VARCHAR(2000)    DECLARE @oldFl_field_02 VARCHAR(2000)    
+--DECLARE @oldFl_field_03 VARCHAR(2000)    DECLARE @oldFl_field_04 VARCHAR(2000)    DECLARE @oldFl_field_05 VARCHAR(2000)    
+--DECLARE @oldFl_field_06 VARCHAR(2000)    DECLARE @oldFl_field_07 VARCHAR(2000)    DECLARE @oldFl_field_08 VARCHAR(2000)   
+-- DECLARE @oldFl_field_09 VARCHAR(2000)    DECLARE @oldFl_field_10 VARCHAR(2000)    DECLARE @oldDivida_orig NUMERIC(10)      
+--DECLARE @savePoint VARCHAR(53)    SET @savePoint = 'Ly_lanc_debito' + CONVERT(VARCHAR, GETDATE(), 126)    
+--BEGIN TRANSACTION    SAVE TRANSACTION @savePoint      -- GetCurrentValues (obt⁄m valores das colunas n“o fornecidas)    
+--EXECUTE zLy_lanc_debito_GetCurrentValues @erro OUTPUT, 'pt-BR', 0,                                            
+-- @pkLanc_deb, @lanc_deb OUTPUT, @codigo_lanc OUTPUT, @aluno OUTPUT, @ano_ref OUTPUT, @periodo_ref OUTPUT,  
+--@data OUTPUT, @valor OUTPUT, @lote OUTPUT, @descricao OUTPUT, @solicitacao OUTPUT,  @item_solicitacao OUTPUT, @trancado_calculo OUTPUT, 
+--@grupo OUTPUT, @matricula OUTPUT, @fl_field_01 OUTPUT, @fl_field_02 OUTPUT, @fl_field_03 OUTPUT, @fl_field_04 OUTPUT,@fl_field_05 OUTPUT, 
+--@fl_field_06 OUTPUT, @fl_field_07 OUTPUT, @fl_field_08 OUTPUT, @fl_field_09 OUTPUT, @fl_field_10 OUTPUT, @divida_orig OUTPUT      
+--IF @erro IS NULL EXECUTE zLy_lanc_debito_GetCurrentValues @erro OUTPUT, 'pt-BR', 1, @pkLanc_deb,   @oldLanc_deb OUTPUT, @oldCodigo_lanc OUTPUT,
+-- @oldAluno OUTPUT, @oldAno_ref OUTPUT, @oldPeriodo_ref OUTPUT, @oldData OUTPUT, @oldValor OUTPUT, @oldLote OUTPUT, @oldDescricao OUTPUT, 
+-- @oldSolicitacao OUTPUT, @oldItem_solicitacao OUTPUT, @oldTrancado_calculo OUTPUT, @oldGrupo OUTPUT, @oldMatricula OUTPUT,
+-- @oldFl_field_01 OUTPUT, @oldFl_field_02 OUTPUT, @oldFl_field_03 OUTPUT, @oldFl_field_04 OUTPUT, @oldFl_field_05 OUTPUT,
+-- @oldFl_field_06 OUTPUT, @oldFl_field_07 OUTPUT, @oldFl_field_08 OUTPUT, @oldFl_field_09 OUTPUT, @oldFl_field_10 OUTPUT, 
+--@oldDivida_orig OUTPUT 
+-- Entry point (Append, Pre) IF @erro IS NULL  IF EXISTS(SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID('dbo.APrU_Ly_lanc_debito') AND 
+-- OBJECTPROPERTY(id, 'IsProcedure') = 1)      BEGIN EXECUTE APrU_Ly_lanc_debito @erro OUTPUT, @oldLanc_deb, @oldCodigo_lanc, @oldAluno,  
+-- @oldAno_ref, @oldPeriodo_ref, @oldData, @oldValor, @oldLote, @oldDescricao, @oldSolicitacao, @oldItem_solicitacao, @oldTrancado_calculo, 
+--@oldGrupo, @oldMatricula, @oldFl_field_01, @oldFl_field_02, @oldFl_field_03, @oldFl_field_04, @oldFl_field_05, @oldFl_field_06, @oldFl_field_07, 
+--@oldFl_field_08, @oldFl_field_09, @oldFl_field_10, @oldDivida_orig, @lanc_deb OUTPUT, @codigo_lanc OUTPUT, @aluno OUTPUT, @ano_ref OUTPUT, 
+--@periodo_ref OUTPUT, @data OUTPUT, @valor OUTPUT, @lote OUTPUT, @descricao OUTPUT, @solicitacao OUTPUT, @item_solicitacao OUTPUT, 
+--@trancado_calculo OUTPUT, @grupo OUTPUT, @matricula OUTPUT, @fl_field_01 OUTPUT, @fl_field_02 OUTPUT, @fl_field_03 OUTPUT, @fl_field_04 OUTPUT, 
+--@fl_field_05 OUTPUT, @fl_field_06 OUTPUT, @fl_field_07 OUTPUT, @fl_field_08 OUTPUT, @fl_field_09 OUTPUT, @fl_field_10 OUTPUT,
+-- @divida_orig OUTPUT IF @erro IS NULL EXECUTE GetErros @erro OUTPUT END -- ValidUpdate    IF @erro IS NULL EXECUTE zLy_lanc_debito_ValidUpdate 
+--@erro OUTPUT, 'pt-BR', @pkLanc_deb, @lanc_deb OUTPUT, @codigo_lanc OUTPUT, @aluno OUTPUT, @ano_ref OUTPUT, @periodo_ref OUTPUT,  
+--  @data OUTPUT, @valor OUTPUT, @lote OUTPUT, @descricao OUTPUT, @solicitacao OUTPUT, @item_solicitacao OUTPUT, @trancado_calculo OUTPUT, 
+--@grupo OUTPUT, @matricula OUTPUT,  @fl_field_01 OUTPUT, @fl_field_02 OUTPUT, @fl_field_03 OUTPUT, @fl_field_04 OUTPUT, @fl_field_05 OUTPUT, 
+--@fl_field_06 OUTPUT, @fl_field_07 OUTPUT, @fl_field_08 OUTPUT, @fl_field_09 OUTPUT, @fl_field_10 OUTPUT, @divida_orig OUTPUT      
+-- Update nas colunas n“o TEXT    IF @erro IS NULL BEGIN UPDATE ly_lanc_debito SET [codigo_lanc] = @codigo_lanc, [aluno] = @aluno, [ano_ref] =
+-- @ano_ref, [periodo_ref] = @periodo_ref, [data] = @data, [valor] = @valor, [lote] = @lote, [descricao] = @descricao, [solicitacao] = 
+--@solicitacao, [item_solicitacao] = @item_solicitacao, [trancado_calculo] = @trancado_calculo, [grupo] = @grupo, [matricula] = 
+--@matricula, [fl_field_01] = @fl_field_01, [fl_field_02] = @fl_field_02, [fl_field_03] = @fl_field_03, [fl_field_04] = @fl_field_04, 
+--[fl_field_05] = @fl_field_05, [fl_field_06] = @fl_field_06, [fl_field_07] = @fl_field_07, [fl_field_08] = @fl_field_08, [fl_field_09] = 
+--@fl_field_09, [fl_field_10] = @fl_field_10, [divida_orig] = @divida_orig WHERE lanc_deb = @pkLanc_deb IF @@ERROR <> 0 SET @erro = '__RAISERROR__'
+--END IF @erro IS NULL    BEGIN      SELECT @lanc_deb = [lanc_deb], @codigo_lanc = [codigo_lanc], @aluno = [aluno], @ano_ref = [ano_ref], 
+--@periodo_ref = [periodo_ref], @data = [data], @valor = [valor], @lote = [lote], @descricao = [descricao],  @solicitacao = [solicitacao], 
+--@item_solicitacao = [item_solicitacao], @trancado_calculo = [trancado_calculo], @grupo = [grupo], @matricula = [matricula], @fl_field_01 = 
+--[fl_field_01], @fl_field_02 = [fl_field_02], @fl_field_03 = [fl_field_03], @fl_field_04 = [fl_field_04], @fl_field_05 = [fl_field_05], 
+--@fl_field_06 = [fl_field_06], @fl_field_07 = [fl_field_07], @fl_field_08 = [fl_field_08], @fl_field_09 = [fl_field_09], @fl_field_10 = 
+--[fl_field_10], @divida_orig = [divida_orig] FROM ly_lanc_debito        WHERE lanc_deb = @pkLanc_deb        -- Entry point (Append, Pos)     
+-- IF EXISTS(SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID('dbo.APoU_Ly_lanc_debito') AND OBJECTPROPERTY(id, 'IsProcedure') = 1)      BEGIN        EXECUTE APoU_Ly_lanc_debito @erro OUTPUT, @oldLanc_deb, @oldCodigo_lanc, @oldAluno,                                                   @oldAno_ref, @oldPeriodo_ref, @oldData, @oldValor, @oldLote, @oldDescricao, @oldSolicitacao,                                                   @oldItem_solicitacao, @oldTrancado_calculo, @oldGrupo, @oldMatricula, @oldFl_field_01,                                                   @oldFl_field_02, @oldFl_field_03, @oldFl_field_04, @oldFl_field_05, @oldFl_field_06,                                                   @oldFl_field_07, @oldFl_field_08, @oldFl_field_09, @oldFl_field_10, @oldDivida_orig,                                    @lanc_deb, @codigo_lanc, @aluno, @ano_ref, @periodo_ref, @data, @valor, @lote, @descricao,                                     @solicitacao, @item_solicitacao, @trancado_calculo, @grupo, @matricula, @fl_field_01,                                     @fl_field_02, @fl_field_03, @fl_field_04, @fl_field_05, @fl_field_06, @fl_field_07,                                     @fl_field_08, @fl_field_09, @fl_field_10, @divida_orig        IF @erro IS NULL EXECUTE GetErros @erro OUTPUT      END    END      IF NOT @erro IS NULL    BEGIN      ROLLBACK TRANSACTION @savePoint      IF @erro = '__RAISERROR__' SET @erro = NULL    END    COMMIT TRANSACTION      SET NOCOUNT OFF  

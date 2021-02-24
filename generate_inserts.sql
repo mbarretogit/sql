@@ -1,0 +1,5 @@
+exec sp_generate_inserts2 'HD_PADACES', @from = "from HD_PADACES where PADACES = 'SEC_GERAL_CONS'"
+exec sp_generate_inserts2 'HD_PADTRANS', @from = "from HD_PADTRANS where PADACES = 'SEC_GERAL_CONS'"
+exec sp_generate_inserts2 'HD_PADREL', @from = "from HD_PADREL where PADACES = 'SEC_GERAL_CONS'"
+exec sp_generate_inserts2 'HD_PADPROC', @from = "from HD_PADPROC where PADACES = 'SEC_GERAL_CONS'"
+exec sp_generate_inserts2 'HD_PADUSUARIO', @from = "from HD_PADUSUARIO where PADACES = 'DomSecGeral'"

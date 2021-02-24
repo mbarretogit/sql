@@ -1,0 +1,106 @@
+ALTER FUNCTION fn_FTC_QTD_DISC_PENDENTE 
+(
+	@v_aluno VARCHAR(20),
+	@v_matricula VARCHAR(1)
+
+) RETURNS INT
+AS
+BEGIN
+DECLARE @qtdDiscPendente INT
+
+
+IF @v_matricula = 'S'
+		BEGIN
+
+			SELECT  @qtdDiscPendente = COUNT(DISTINCT G.DISCIPLINA) 
+			FROM LY_ALUNO A
+						   INNER JOIN LY_GRADE G 
+											ON G.CURSO=A.CURSO 
+										   AND G.CURRICULO=A.CURRICULO 
+										   AND G.TURNO=A.TURNO
+						   INNER JOIN LY_DISCIPLINA D 
+												 ON D.DISCIPLINA= G.DISCIPLINA 
+						   INNER JOIN LY_CURSO C 
+											ON C.CURSO=A.CURSO 
+										   AND C.TIPO IN ('GRADUACAO','TECNOLOGO')
+						   INNER JOIN LY_CURRICULO CU 
+												ON A.CURSO=CU.CURSO
+											  AND A.TURNO=CU.TURNO
+											  AND A.CURRICULO=CU.CURRICULO
+			WHERE 1=1 AND A.SIT_ALUNO IN ('Ativo','Inconcluido') AND A.ALUNO = @v_aluno
+			AND NOT EXISTS
+						  (SELECT TOP 1 1 
+							   FROM  LY_HISTMATRICULA H
+												WHERE H.ALUNO = A.ALUNO 
+												 AND (H.DISCIPLINA=G.DISCIPLINA 
+												  OR (G.FORMULA_EQUIV LIKE '%'+H.DISCIPLINA+'%' 
+												  AND G.CURSO = A.CURSO 
+												  AND G.CURRICULO = A.CURRICULO 
+												  AND G.TURNO = A.TURNO))
+												 AND  H.SITUACAO_HIST IN ('Aprovado','Dispensado')
+						  )
+			AND NOT EXISTS
+						  (SELECT TOP 1 1
+							   FROM  LY_MATRICULA MM 
+							   WHERE ( MM.DISCIPLINA=G.DISCIPLINA OR G.FORMULA_EQUIV LIKE '%'+MM.DISCIPLINA+'%')
+							   AND MM.ALUNO=A.ALUNO
+                                                      
+						  )
+
+		END 
+
+	IF @v_matricula = 'N'
+		BEGIN
+	
+		SELECT  @qtdDiscPendente = COUNT(DISTINCT G.DISCIPLINA) 
+		FROM LY_ALUNO A
+					   INNER JOIN LY_GRADE G 
+										ON G.CURSO=A.CURSO 
+									   AND G.CURRICULO=A.CURRICULO 
+									   AND G.TURNO=A.TURNO
+					   INNER JOIN LY_DISCIPLINA D 
+											 ON D.DISCIPLINA= G.DISCIPLINA 
+					   INNER JOIN LY_CURSO C 
+										ON C.CURSO=A.CURSO 
+									   AND C.TIPO IN ('GRADUACAO','TECNOLOGO')
+					   INNER JOIN LY_CURRICULO CU 
+											ON A.CURSO=CU.CURSO
+										  AND A.TURNO=CU.TURNO
+										  AND A.CURRICULO=CU.CURRICULO
+		WHERE 1=1 AND A.SIT_ALUNO IN ('Ativo','Inconcluido') AND A.ALUNO = @v_aluno
+		AND NOT EXISTS
+					  (SELECT TOP 1 1 
+						   FROM  LY_HISTMATRICULA H
+											WHERE H.ALUNO = A.ALUNO 
+											 AND (H.DISCIPLINA=G.DISCIPLINA 
+											  OR (G.FORMULA_EQUIV LIKE '%'+H.DISCIPLINA+'%' 
+											  AND G.CURSO = A.CURSO 
+											  AND G.CURRICULO = A.CURRICULO 
+											  AND G.TURNO = A.TURNO))
+											 AND  H.SITUACAO_HIST IN ('Aprovado','Dispensado')
+					  )
+		END
+		RETURN @qtdDiscPendente
+END
+GO
+
+    
+DELETE FROM LY_CUSTOM_CLIENTE    
+where NOME = 'fn_FTC_QTD_DISC_PENDENTE'    
+and IDENTIFICACAO_CODIGO = '0001' 
+GO
+
+INSERT INTO LY_CUSTOM_CLIENTE
+(NOME, IDENTIFICACAO_CODIGO, AUTOR, DATA_CRIACAO, OBJETIVO, SOLICITADO_POR, ATIVO, TIPOCOMPONENTE, TIPO, CLIENTE)
+SELECT
+  'fn_FTC_QTD_DISC_PENDENTE' NOME
+, '0001' IDENTIFICAO_CODIGO
+, 'Miguel' AUTOR
+, '2018-10-01' DATA_CRIACAO
+, 'Função - Quantidade de Disciplinas Pendentes do Aluno' OBJETIVO
+, 'Greice Kelly' SOLICITADO_POR
+, 'S' ATIVO
+, 'FUNCION' TIPOCOMPONENTE
+, 'CLIENTE' TIPO
+, 'FTC' CLIENTE
+GO 

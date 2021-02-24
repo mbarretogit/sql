@@ -1,0 +1,15 @@
+  USE LYCEUM
+  GO
+
+
+ALTER PROCEDURE [dbo].[Relat_P_UnidadeEnsino]    
+AS    
+BEGIN    
+  
+   SELECT DISTINCT FACULDADE AS CODIGO, (FACULDADE + ' - ' + NOME_COMP + (CASE WHEN CGC IS NULL THEN '' ELSE ' - CNPJ: ' + dbo.fn_FormataNumeroCNPJ(CGC) END)) AS DESCR  
+   FROM VW_FACULDADE  
+   WHERE ENSINO = 'S'  
+   UNION  
+   SELECT NULL AS CODIGO, 'TODAS' AS DESCR     
+  
+END    

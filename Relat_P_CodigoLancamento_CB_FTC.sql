@@ -1,0 +1,72 @@
+USE LYCEUM
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND OBJECT_ID = OBJECT_ID('dbo.Relat_P_CodigoLancamento_CB_FTC'))
+   exec('CREATE PROCEDURE [dbo].[Relat_P_CodigoLancamento_CB_FTC] AS BEGIN SET NOCOUNT OFF; END')
+GO
+
+ALTER PROCEDURE dbo.Relat_P_CodigoLancamento_CB_FTC    
+  
+  
+@tp_relatorio int  
+  
+  
+AS    
+    
+    
+  
+-- [INÍCIO]            
+BEGIN    
+    
+  IF(@tp_relatorio = 1)  
+ BEGIN  
+  SELECT CODIGO_LANC AS CODIGO, CODIGO_LANC + ' - ' + DESCRICAO AS DESCR     
+  FROM LY_COD_LANC  
+  WHERE CODIGO_LANC IN ('INTEGRAL','MIG','MS','MS_EB','MT')  
+ END  
+  IF(@tp_relatorio = 2)  
+ BEGIN  
+  SELECT CODIGO_LANC AS CODIGO, CODIGO_LANC + ' - ' + DESCRICAO AS DESCR     
+  FROM LY_COD_LANC  
+  WHERE CODIGO_LANC IN ('ACADEMIA','FARDA','MD','REQ','TX_MAT_FORA_PRAZO')  
+ END  
+  IF(@tp_relatorio = 3)  
+ BEGIN  
+  SELECT CODIGO_LANC AS CODIGO, CODIGO_LANC + ' - ' + DESCRICAO AS DESCR     
+  FROM LY_COD_LANC  
+  WHERE CODIGO_LANC IN ('CD','CH')  
+ END  
+  IF(@tp_relatorio = 4)  
+ BEGIN  
+  SELECT CODIGO_LANC AS CODIGO, CODIGO_LANC + ' - ' + DESCRICAO AS DESCR     
+  FROM LY_COD_LANC  
+  WHERE CODIGO_LANC IN ('ACORDO')  
+ END  
+  IF(@tp_relatorio = 5)  
+ BEGIN  
+  SELECT CODIGO_LANC AS CODIGO, CODIGO_LANC + ' - ' + DESCRICAO AS DESCR     
+  FROM LY_COD_LANC  
+  WHERE CODIGO_LANC IN ('FIES')  
+ END  
+  IF(@tp_relatorio = 6)  
+ BEGIN  
+  SELECT CODIGO_LANC AS CODIGO, CODIGO_LANC + ' - ' + DESCRICAO AS DESCR     
+  FROM LY_COD_LANC  
+  WHERE CODIGO_LANC IN ('FINAN')  
+ END  
+  IF(@tp_relatorio = 7)  
+ BEGIN  
+  SELECT CODIGO_LANC AS CODIGO, CODIGO_LANC + ' - ' + DESCRICAO AS DESCR     
+  FROM LY_COD_LANC  
+  WHERE CODIGO_LANC IN ('BIB','MS_MULTA')  
+ END  
+  IF(@tp_relatorio = 8)  
+ BEGIN  
+   SELECT NULL AS CODIGO, 'TODOS' AS DESCR    
+   UNION    
+   SELECT CODIGO_LANC AS CODIGO, CODIGO_LANC + ' - ' + DESCRICAO AS DESCR     
+   FROM LY_COD_LANC   
+ END  
+     
+-- [TÉRMINO]    
+END 

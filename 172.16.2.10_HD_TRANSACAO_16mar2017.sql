@@ -1,0 +1,31 @@
+USE LYCEUM
+GO
+
+INSERT INTO HD_TRANSACAO
+(
+	SIS,
+	TRANS,
+	NOME,
+	PUBLICA,
+	ACESSOANONIMO,
+	PAGINAWEB,
+	FORM,
+	ITEMMENU,
+	AUDITAR,
+	MODULO
+)
+VALUES
+(
+	'C_AOnline',
+	'CAFTC001D',
+	'Acesso Minha Biblioteca',
+	'N',
+	'N',
+	NULL,
+	NULL,
+	NULL,
+	'N',
+	NULL
+)
+
+GO

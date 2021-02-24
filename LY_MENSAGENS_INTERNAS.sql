@@ -1,0 +1,24 @@
+USE LYCEUM
+GO
+
+-- --------------------------------------------------
+-- TABELA: LY_MENSAGENS_INTERNAS
+-- --------------------------------------------------
+
+IF dbo.fn_ExisteTabela('LY_MENSAGENS_INTERNAS') = 'N'
+BEGIN
+    CREATE TABLE LY_MENSAGENS_INTERNAS (
+      ID		T_NUMERO IDENTITY(1,1) NOT NULL,
+      DATA		T_DATA NULL,
+      MENSAGEM	T_ALFA7000 NULL
+    )
+END
+GO
+
+IF dbo.fn_ExisteChave('PK_LY_MENSAGENS_INTERNAS') = 'N'
+BEGIN
+  ALTER TABLE LY_MENSAGENS_INTERNAS
+    ADD CONSTRAINT PK_LY_MENSAGENS_INTERNAS PRIMARY KEY (ID) 
+END
+  
+GO
